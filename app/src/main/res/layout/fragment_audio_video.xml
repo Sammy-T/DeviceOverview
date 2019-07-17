@@ -1,0 +1,54 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:gravity="center"
+    tools:context="sammyt.deviceoverview.AudioFragment">
+
+    <ak.sh.ay.musicwave.MusicWave
+        android:id="@+id/music_wave"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        app:colorGradient="true"
+        app:startColor="@color/colorPrimary"
+        app:endColor="@color/colorWaveEnd"
+        app:waveThickness="10" />
+    <SeekBar
+        android:id="@+id/seek_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:id="@+id/media_time"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:gravity="center"
+        android:text="..." />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+        <Button
+            android:id="@+id/record_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:text="Rec" />
+        <Button
+            android:id="@+id/play_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:theme="@style/ButtonTheme"
+            android:text="Play" />
+    </LinearLayout>
+    <Button
+        android:id="@+id/local_music"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:text="Local Music Apps"/>
+
+</LinearLayout>

@@ -1,0 +1,44 @@
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="sammyt.deviceoverview.SensorFragment">
+
+    <LinearLayout
+        android:id="@+id/sensor_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <sammyt.deviceoverview.CustomBar
+            android:id="@+id/custom_accel_x"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:padding="16dp" />
+        <sammyt.deviceoverview.CustomBar
+            android:id="@+id/custom_accel_y"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:padding="16dp" />
+        <sammyt.deviceoverview.CustomBar
+            android:id="@+id/custom_accel_z"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:padding="16dp" />
+
+        <lecho.lib.hellocharts.view.BubbleChartView
+            android:id="@+id/chart"
+            android:layout_width="match_parent"
+            android:layout_height="150dp" />
+
+        <sammyt.deviceoverview.BubbleChartView
+            android:layout_width="match_parent"
+            android:layout_height="160dp" />
+
+        <sammyt.deviceoverview.CustomVertBar
+            android:layout_width="50dp"
+            android:layout_height="150dp"
+            android:padding="30dp" />
+    </LinearLayout>
+</ScrollView>

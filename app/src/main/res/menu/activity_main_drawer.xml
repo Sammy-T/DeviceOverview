@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- TODO: Hardcoded text to resource strings -->
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_home"
+            android:icon="@android:drawable/ic_menu_info_details"
+            android:title="@string/home" />
+        <item
+            android:id="@+id/nav_camera"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="@string/camera" />
+        <item
+            android:id="@+id/nav_battery"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="@string/battery" />
+        <item
+            android:id="@+id/nav_audio_video"
+            android:icon="@android:drawable/ic_media_play"
+            android:title="@string/audio" />
+        <item
+            android:id="@+id/nav_sensor"
+            android:title="Sensors" />
+
+        <!--TODO: Remove-->
+        <item
+            android:id="@+id/nav_debug_bubble"
+            android:title="debug bubble" />
+    </group>
+
+    <!--<item android:title="Communicate">
+        <menu>
+            <item
+                android:id="@+id/nav_share"
+                android:icon="@drawable/ic_menu_share"
+                android:title="Share" />
+            <item
+                android:id="@+id/nav_send"
+                android:icon="@drawable/ic_menu_send"
+                android:title="Send" />
+        </menu>
+    </item>-->
+
+</menu>

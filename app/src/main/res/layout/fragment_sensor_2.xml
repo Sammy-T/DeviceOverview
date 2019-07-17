@@ -1,0 +1,39 @@
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="sammyt.deviceoverview.SensorFragment">
+
+    <LinearLayout
+        android:id="@+id/sensor_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="6dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <lecho.lib.hellocharts.view.BubbleChartView
+                android:id="@+id/chart"
+                android:layout_width="0dp"
+                android:layout_height="150dp"
+                android:layout_weight="1"/>
+
+            <sammyt.deviceoverview.CustomVertBar
+                android:id="@+id/chart_z"
+                android:layout_width="50dp"
+                android:layout_height="match_parent"
+                android:padding="30dp" />
+        </LinearLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/sensor_grid"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:layout_marginTop="30dp" />
+    </LinearLayout>
+</ScrollView>

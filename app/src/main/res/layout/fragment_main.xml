@@ -1,0 +1,144 @@
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="8dp"
+    tools:context="sammyt.deviceoverview.MainFragment">
+
+    <!-- TODO: Hardcoded text to resource strings -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/android_version_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:gravity="center"
+            android:textSize="18sp"
+            android:textColor="@color/colorPrimary"
+            android:text="@string/hello_blank_fragment" />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/device_feature_title"
+                android:text="Security Patch:"/>
+            <TextView
+                android:id="@+id/security_patch_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Unable to read"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/device_feature_title"
+                android:text="Brand:"/>
+            <TextView
+                android:id="@+id/brand_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/device_feature_title"
+                android:text="Manufacturer:"/>
+            <TextView
+                android:id="@+id/manufacturer_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/device_feature_title"
+                android:text="Model:"/>
+            <TextView
+                android:id="@+id/model_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/device_feature_title"
+                android:text="Cpu Abi:"/>
+            <TextView
+                android:id="@+id/cpu_abi_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/device_feature_title"
+                android:text="Cpu Abi2:"/>
+            <TextView
+                android:id="@+id/cpu_abi2_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <!-- Display -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="6dp"
+            android:textSize="16sp"
+            android:textColor="@color/colorPrimary"
+            android:text="Display" />
+        <LinearLayout
+            android:id="@+id/display_info_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+
+
+        <!-- Sensors -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="6dp"
+            android:textSize="16sp"
+            android:textColor="@color/colorPrimary"
+            android:text="Sensors" />
+        <TextView
+            android:id="@+id/sensors_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="3dp"
+            android:textSize="15sp"
+            android:lineSpacingExtra="2.5sp" />
+    </LinearLayout>
+
+</ScrollView>
