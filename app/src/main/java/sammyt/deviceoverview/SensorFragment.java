@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -43,6 +44,7 @@ public class SensorFragment extends Fragment implements SensorEventListener{
 
     private ModBubbleChartView mSensorChartView;
     private CustomVertBar mSensorBarZ;
+    private TextView mSensorValuesText;
     private RecyclerView mSensorGridView;
 
     private SingleSensorAdapter mSingleAdapter;
@@ -63,7 +65,8 @@ public class SensorFragment extends Fragment implements SensorEventListener{
         // Inflate the layout for this fragment
         View root = inflater.inflate(R.layout.fragment_sensor, container, false);
         mSensorChartView = root.findViewById(R.id.chart);
-        mSensorGridView = (RecyclerView) root.findViewById(R.id.sensor_grid);
+        mSensorValuesText = root.findViewById(R.id.sensor_values_text);
+        mSensorGridView = root.findViewById(R.id.sensor_grid);
 
         Viewport viewport = new Viewport(mSensorChartView.getMaximumViewport());
         viewport.bottom = -15;
@@ -140,14 +143,13 @@ public class SensorFragment extends Fragment implements SensorEventListener{
                     break;
                 }
                 mSensorVals = new float[]{event.values[0], event.values[1], event.values[2]};
-//                mAccelText = new String[]{
-//                        "x: " + (event.values[0] * 10),
-//                        "y: " + (event.values[1] * 10),
-//                        "z: " + (event.values[2] * 10)};
-//                mAccelBarX.setProgress(mAccelVals[0]*10, mAccelText[0]);
-//                mAccelBarY.setProgress(mAccelVals[1]*10, mAccelText[1]);
 
-//                mSensorBarZ.setProgress(mSensorVals[2]*10, df.format(event.values[2]), "Z");
+                StringBuilder sensorValues = new StringBuilder();
+                for(float sensorVal: event.values){
+                    sensorValues.append(df.format(sensorVal)).append(" \t ");
+                }
+                mSensorValuesText.setText(sensorValues);
+
                 refreshChart();
                 break;
             case Sensor.TYPE_STEP_COUNTER:
@@ -173,12 +175,17 @@ public class SensorFragment extends Fragment implements SensorEventListener{
 
     private void refreshChart(){
         List<BubbleValue> bubbleValues = new ArrayList<>();
+
+        // Add a base value equal to the max Z size to scale to
         bubbleValues.add(new BubbleValue(0,0,10));
 
         BubbleValue value = new BubbleValue(mSensorVals[0], mSensorVals[1], mSensorVals[2]);
         Log.d(LOG_TAG, "val: " + value.getX() + " " + value.getY() + " " + value.getZ());
-//        value.setColor(ChartUtils.pickColor());
-        value.setColor(Color.BLUE);
+        if(value.getZ() >= 0) { // Change the color if it's negative or positive
+            value.setColor(Color.BLUE);
+        }else{
+            value.setColor(Color.RED);
+        }
         value.setShape(mShape);
         bubbleValues.add(value);
 
@@ -186,8 +193,8 @@ public class SensorFragment extends Fragment implements SensorEventListener{
 
         Axis axisX = new Axis();
         Axis axisY = new Axis().setHasLines(true);
-        axisX.setName("Axis X");
-        axisY.setName("Axis Y");
+//        axisX.setName("Axis X");
+//        axisY.setName("Axis Y");
         mSensorChartData.setAxisXBottom(axisX);
         mSensorChartData.setAxisYLeft(axisY);
 
