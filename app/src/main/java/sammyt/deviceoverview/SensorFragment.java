@@ -12,15 +12,9 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.GridView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -34,6 +28,7 @@ import lecho.lib.hellocharts.model.ValueShape;
 import lecho.lib.hellocharts.model.Viewport;
 import lecho.lib.hellocharts.util.ChartUtils;
 import lecho.lib.hellocharts.view.BubbleChartView;
+import sammyt.deviceoverview.hellocharts.extension.ModBubbleChartView;
 
 
 /**
@@ -46,10 +41,7 @@ public class SensorFragment extends Fragment implements SensorEventListener{
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
 
-//    private CustomBar mAccelBarX;
-//    private CustomBar mAccelBarY;
-//    private CustomBar mAccelBarZ;
-    private BubbleChartView mSensorChartView;
+    private ModBubbleChartView mSensorChartView;
     private CustomVertBar mSensorBarZ;
     private RecyclerView mSensorGridView;
 
@@ -69,16 +61,10 @@ public class SensorFragment extends Fragment implements SensorEventListener{
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View root = inflater.inflate(R.layout.fragment_sensor_2, container, false);
-
-//        mAccelBarX = (CustomBar) root.findViewById(R.id.custom_accel_x);
-//        mAccelBarY = (CustomBar) root.findViewById(R.id.custom_accel_y);
-//        mAccelBarZ = (CustomBar) root.findViewById(R.id.custom_accel_z);
-        mSensorChartView = (BubbleChartView) root.findViewById(R.id.chart);
-        mSensorBarZ = (CustomVertBar) root.findViewById(R.id.chart_z);
+        View root = inflater.inflate(R.layout.fragment_sensor, container, false);
+        mSensorChartView = root.findViewById(R.id.chart);
         mSensorGridView = (RecyclerView) root.findViewById(R.id.sensor_grid);
 
-        //// TODO: Setting viewport is definitely messing with the z value
         Viewport viewport = new Viewport(mSensorChartView.getMaximumViewport());
         viewport.bottom = -15;
         viewport.top = 15;
@@ -160,7 +146,8 @@ public class SensorFragment extends Fragment implements SensorEventListener{
 //                        "z: " + (event.values[2] * 10)};
 //                mAccelBarX.setProgress(mAccelVals[0]*10, mAccelText[0]);
 //                mAccelBarY.setProgress(mAccelVals[1]*10, mAccelText[1]);
-                mSensorBarZ.setProgress(mSensorVals[2]*10, df.format(event.values[2]), "Z");
+
+//                mSensorBarZ.setProgress(mSensorVals[2]*10, df.format(event.values[2]), "Z");
                 refreshChart();
                 break;
             case Sensor.TYPE_STEP_COUNTER:
@@ -186,24 +173,14 @@ public class SensorFragment extends Fragment implements SensorEventListener{
 
     private void refreshChart(){
         List<BubbleValue> bubbleValues = new ArrayList<>();
-        BubbleValue value = new BubbleValue(mSensorVals[0], mSensorVals[1], mSensorVals[2] * 100);
+        bubbleValues.add(new BubbleValue(0,0,10));
+
+        BubbleValue value = new BubbleValue(mSensorVals[0], mSensorVals[1], mSensorVals[2]);
         Log.d(LOG_TAG, "val: " + value.getX() + " " + value.getY() + " " + value.getZ());
 //        value.setColor(ChartUtils.pickColor());
         value.setColor(Color.BLUE);
         value.setShape(mShape);
         bubbleValues.add(value);
-
-        //// TODO: Remove
-        for(int i=0; i < 5; i++){
-            BubbleValue loopVal = new BubbleValue(i + 5,
-                    (float) Math.random() * 10,
-                    (float) Math.random() * 100);
-            Log.d(LOG_TAG, loopVal.toString());
-            loopVal.setColor(ChartUtils.pickColor());
-            loopVal.setShape(ValueShape.CIRCLE);
-            bubbleValues.add(loopVal);
-        }
-        ////
 
         mSensorChartData = new BubbleChartData(bubbleValues);
 

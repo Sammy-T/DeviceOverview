@@ -18,7 +18,7 @@ import lecho.lib.hellocharts.view.AbstractChartView;
 
 public class ModBubbleChartView extends AbstractChartView implements BubbleChartDataProvider {
 
-    private static final String TAG = "BubbleChartView";
+    private static final String TAG = "ModBubbleChartView";
     protected BubbleChartData data;
     protected BubbleChartOnValueSelectListener onValueTouchListener = new DummyBubbleChartOnValueSelectListener();
 
@@ -47,7 +47,7 @@ public class ModBubbleChartView extends AbstractChartView implements BubbleChart
     @Override
     public void setBubbleChartData(BubbleChartData data) {
         if (BuildConfig.DEBUG) {
-            Log.d(TAG, "Setting data for BubbleChartView");
+            Log.d(TAG, "Setting data for ModBubbleChartView");
         }
 
         if (null == data) {

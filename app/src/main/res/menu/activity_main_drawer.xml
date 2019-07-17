@@ -22,11 +22,6 @@
         <item
             android:id="@+id/nav_sensor"
             android:title="Sensors" />
-
-        <!--TODO: Remove-->
-        <item
-            android:id="@+id/nav_debug_bubble"
-            android:title="debug bubble" />
     </group>
 
     <!--<item android:title="Communicate">
