@@ -387,9 +387,9 @@ public class ModBubbleChartRenderer extends AbstractChartRenderer {
             bubbleScaleY = 1;
         }
 
-        Log.d(LOG_TAG, tempMaximumViewport.toString());
-        Log.d(LOG_TAG, "scaleX: " + bubbleScaleX + " scaleY: " + bubbleScaleY
-                + " maxZ: " + maxZ + " maxRadius: " + maxRadius);
+//        Log.d(LOG_TAG, tempMaximumViewport.toString());
+//        Log.d(LOG_TAG, "scaleX: " + bubbleScaleX + " scaleY: " + bubbleScaleY
+//                + " maxZ: " + maxZ + " maxRadius: " + maxRadius);
 
         // For cases when user sets different than 1 bubble scale in BubbleChartData.
         bubbleScaleX *= data.getBubbleScale();
