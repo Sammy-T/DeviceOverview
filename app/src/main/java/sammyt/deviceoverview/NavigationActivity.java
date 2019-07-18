@@ -168,22 +168,6 @@ public class NavigationActivity extends AppCompatActivity
                         .addToBackStack(SENSOR_FRAGMENT)
                         .commit();
                 break;
-
-            case R.id.nav_debug_bubble:
-                String TAG = "DEBUG_FRAG";
-                BubbleDebugFragment debugFragment = (BubbleDebugFragment) fragmentManager.findFragmentByTag(TAG);
-
-                if(debugFragment != null && debugFragment.isVisible()){
-                    break;
-                }else if(debugFragment == null){
-                    debugFragment = new BubbleDebugFragment();
-                }
-
-                fragmentManager.beginTransaction()
-                        .replace(R.id.content_container, debugFragment, TAG)
-                        .addToBackStack(TAG)
-                        .commit();
-                break;
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

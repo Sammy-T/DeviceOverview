@@ -8,18 +8,17 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.GridView;
-import android.widget.LinearLayout;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.text.DecimalFormat;
@@ -34,6 +33,7 @@ import lecho.lib.hellocharts.model.ValueShape;
 import lecho.lib.hellocharts.model.Viewport;
 import lecho.lib.hellocharts.util.ChartUtils;
 import lecho.lib.hellocharts.view.BubbleChartView;
+import sammyt.deviceoverview.hellocharts.extension.ModBubbleChartView;
 
 
 /**
@@ -44,59 +44,117 @@ public class SensorFragment extends Fragment implements SensorEventListener{
     private final String LOG_TAG = this.getClass().getSimpleName();
 
     private SensorManager mSensorManager;
-    private Sensor mAccelerometer;
+    private Sensor mSelectedSensor;
 
-//    private CustomBar mAccelBarX;
-//    private CustomBar mAccelBarY;
-//    private CustomBar mAccelBarZ;
-    private BubbleChartView mSensorChartView;
-    private CustomVertBar mSensorBarZ;
-    private RecyclerView mSensorGridView;
+    private ModBubbleChartView mSensorChartView;
+    private TextView mSensorValuesText;
 
     private SingleSensorAdapter mSingleAdapter;
-    private ArrayList<Sensor> mSensorList;
+    private ArrayList<Sensor> mSingleSensorList;
+
+    private ArrayList<Sensor> mMultipleSensorList;
 
     private float[] mSensorVals;
-    private String[] mSensorText;
-    private BubbleChartData mSensorChartData;
-    private ValueShape mShape = ValueShape.CIRCLE;
+    private float mMaxZ = 10;
 
     public SensorFragment() {
         // Required empty public constructor
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View root = inflater.inflate(R.layout.fragment_sensor_2, container, false);
+        View root = inflater.inflate(R.layout.fragment_sensor, container, false);
+        mSensorChartView = root.findViewById(R.id.chart);
+        mSensorValuesText = root.findViewById(R.id.sensor_values_text);
+        Spinner sensorMultSpinner = root.findViewById(R.id.sensor_spinner);
+        RecyclerView sensorGridView = root.findViewById(R.id.sensor_grid);
 
-//        mAccelBarX = (CustomBar) root.findViewById(R.id.custom_accel_x);
-//        mAccelBarY = (CustomBar) root.findViewById(R.id.custom_accel_y);
-//        mAccelBarZ = (CustomBar) root.findViewById(R.id.custom_accel_z);
-        mSensorChartView = (BubbleChartView) root.findViewById(R.id.chart);
-        mSensorBarZ = (CustomVertBar) root.findViewById(R.id.chart_z);
-        mSensorGridView = (RecyclerView) root.findViewById(R.id.sensor_grid);
-
-        //// TODO: Setting viewport is definitely messing with the z value
-        Viewport viewport = new Viewport(mSensorChartView.getMaximumViewport());
-        viewport.bottom = -15;
-        viewport.top = 15;
-        viewport.left = -15;
-        viewport.right = 15;
-        mSensorChartView.setMaximumViewport(viewport);
-        mSensorChartView.setCurrentViewport(viewport);
-        mSensorChartView.setViewportCalculationEnabled(false);
-//        mAccelChartView.setZoomEnabled(false);
+        // Set fixed viewport dimensions
+        setViewPort(15);
 
         mSensorManager = (SensorManager) getContext().getSystemService(Context.SENSOR_SERVICE);
-
-        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-
         List<Sensor> sensors = mSensorManager.getSensorList(Sensor.TYPE_ALL);
 
+        // Build the array lists with multiple value sensors
+        mMultipleSensorList = new ArrayList<>();
+        ArrayList<String> multSensorNamesList = new ArrayList<>();
+
+        for(Sensor multSensor: sensors){
+            boolean addMultToList = false;
+
+            switch(multSensor.getType()){
+                case Sensor.TYPE_ACCELEROMETER:
+                    addMultToList = true;
+                    break;
+                case Sensor.TYPE_GRAVITY:
+                    addMultToList = true;
+                    break;
+                case Sensor.TYPE_GYROSCOPE:
+                    addMultToList = true;
+                    break;
+                case Sensor.TYPE_LINEAR_ACCELERATION:
+                    addMultToList = true;
+                    break;
+                case Sensor.TYPE_ROTATION_VECTOR: // 4 value type
+                    addMultToList = false; //// TODO: Do I want to add this one?
+                    break;
+                case Sensor.TYPE_GAME_ROTATION_VECTOR:
+                    addMultToList = true;
+                    break;
+                case Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR:
+                    addMultToList = true;
+                    break;
+                case Sensor.TYPE_MAGNETIC_FIELD:
+                    addMultToList = true;
+                    break;
+            }
+
+            if(addMultToList){
+                mMultipleSensorList.add(multSensor);
+                multSensorNamesList.add(multSensor.getName());
+            }
+        }
+
+        // Set up the sensor spinner
+        ArrayAdapter sensorMultAdapter = new ArrayAdapter<>(getContext(),
+                android.R.layout.simple_spinner_dropdown_item, multSensorNamesList);
+        sensorMultSpinner.setAdapter(sensorMultAdapter);
+
+        sensorMultSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Log.d(LOG_TAG, "item selected " + mMultipleSensorList.get(position).getName());
+
+                unregisterSensor(mSelectedSensor); // Unregister previously selected sensor
+
+                int sensorType = mMultipleSensorList.get(position).getType();
+                mSelectedSensor = mSensorManager.getDefaultSensor(sensorType);
+
+                registerSensor(mSelectedSensor); // Register currently selected sensor
+
+                // Set Z value and Viewport size to accommodate the values returned from the selected sensor
+                if(mSelectedSensor.getType() == Sensor.TYPE_MAGNETIC_FIELD){
+                    setViewPort(100);
+                    mMaxZ = 100;
+                }else{
+                    setViewPort(15);
+                    mMaxZ = 10;
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                Log.d(LOG_TAG, "nothing selected");
+            }
+        });
+
+        // Set the initial sensor
+        mSelectedSensor = mSensorManager.getDefaultSensor(mMultipleSensorList.get(0).getType());
+
         // Build the array list with the single value sensors
-        mSensorList = new ArrayList<>();
+        mSingleSensorList = new ArrayList<>();
 
         for(Sensor sensor: sensors){
             boolean addToList = false;
@@ -123,15 +181,15 @@ public class SensorFragment extends Fragment implements SensorEventListener{
             }
 
             if(addToList){
-                mSensorList.add(sensor);
+                mSingleSensorList.add(sensor);
             }
         }
 
         GridLayoutManager layoutManager = new GridLayoutManager(getContext(), 2);
-        mSensorGridView.setLayoutManager(layoutManager);
+        sensorGridView.setLayoutManager(layoutManager);
 
-        mSingleAdapter = new SingleSensorAdapter(mSensorList);
-        mSensorGridView.setAdapter(mSingleAdapter);
+        mSingleAdapter = new SingleSensorAdapter(mSingleSensorList);
+        sensorGridView.setAdapter(mSingleAdapter);
 
         return root;
     }
@@ -149,20 +207,6 @@ public class SensorFragment extends Fragment implements SensorEventListener{
         df.setMaximumFractionDigits(2);
 
         switch(sensorType){
-            case Sensor.TYPE_ACCELEROMETER:
-                if(mSensorVals != null && Arrays.equals(mSensorVals, event.values)){
-                    break;
-                }
-                mSensorVals = new float[]{event.values[0], event.values[1], event.values[2]};
-//                mAccelText = new String[]{
-//                        "x: " + (event.values[0] * 10),
-//                        "y: " + (event.values[1] * 10),
-//                        "z: " + (event.values[2] * 10)};
-//                mAccelBarX.setProgress(mAccelVals[0]*10, mAccelText[0]);
-//                mAccelBarY.setProgress(mAccelVals[1]*10, mAccelText[1]);
-                mSensorBarZ.setProgress(mSensorVals[2]*10, df.format(event.values[2]), "Z");
-                refreshChart();
-                break;
             case Sensor.TYPE_STEP_COUNTER:
                 mSingleAdapter.updateItem(event.sensor, event.values[0]);
                 break;
@@ -181,56 +225,85 @@ public class SensorFragment extends Fragment implements SensorEventListener{
             case Sensor.TYPE_RELATIVE_HUMIDITY:
                 mSingleAdapter.updateItem(event.sensor, event.values[0]);
                 break;
+                default:
+                    if(event.values.length == 3){ //// TODO: Switch this to >= for the 4 value sensor?
+                        if(mSensorVals != null && Arrays.equals(mSensorVals, event.values)){
+                            break; // Break early if it's a duplicate value
+                        }
+                        mSensorVals = new float[]{event.values[0], event.values[1], event.values[2]};
+
+                        // Set the text value of the sensor data
+                        StringBuilder sensorValues = new StringBuilder();
+                        for(float sensorVal: event.values){
+                            sensorValues.append(df.format(sensorVal)).append(" \t ");
+                        }
+                        mSensorValuesText.setText(sensorValues);
+
+                        refreshChart();
+                    }
+                    break;
         }
     }
 
     private void refreshChart(){
         List<BubbleValue> bubbleValues = new ArrayList<>();
-        BubbleValue value = new BubbleValue(mSensorVals[0], mSensorVals[1], mSensorVals[2] * 100);
-        Log.d(LOG_TAG, "val: " + value.getX() + " " + value.getY() + " " + value.getZ());
-//        value.setColor(ChartUtils.pickColor());
-        value.setColor(Color.BLUE);
-        value.setShape(mShape);
+
+        // Since we're only plotting one value,
+        // Add a base value equal to the max Z size to scale against
+        bubbleValues.add(new BubbleValue(0,0, mMaxZ));
+
+        // Add the sensor's value
+        BubbleValue value = new BubbleValue(mSensorVals[0], mSensorVals[1], mSensorVals[2]);
+        if(value.getZ() >= 0) { // Change the color if it's negative or positive
+            value.setColor(Color.BLUE);
+        }else{
+            value.setColor(Color.RED);
+        }
+        value.setShape(ValueShape.CIRCLE);
         bubbleValues.add(value);
 
-        //// TODO: Remove
-        for(int i=0; i < 5; i++){
-            BubbleValue loopVal = new BubbleValue(i + 5,
-                    (float) Math.random() * 10,
-                    (float) Math.random() * 100);
-            Log.d(LOG_TAG, loopVal.toString());
-            loopVal.setColor(ChartUtils.pickColor());
-            loopVal.setShape(ValueShape.CIRCLE);
-            bubbleValues.add(loopVal);
-        }
-        ////
+        Log.d(LOG_TAG, "val: " + value.getX() + " " + value.getY() + " " + value.getZ());
 
-        mSensorChartData = new BubbleChartData(bubbleValues);
+        // Create the chart data from the values
+        BubbleChartData sensorChartData = new BubbleChartData(bubbleValues);
 
+        // Set the axis attributes
         Axis axisX = new Axis();
         Axis axisY = new Axis().setHasLines(true);
-        axisX.setName("Axis X");
-        axisY.setName("Axis Y");
-        mSensorChartData.setAxisXBottom(axisX);
-        mSensorChartData.setAxisYLeft(axisY);
+//        axisX.setName("Axis X");
+//        axisY.setName("Axis Y");
+        sensorChartData.setAxisXBottom(axisX);
+        sensorChartData.setAxisYLeft(axisY);
 
-        mSensorChartView.setBubbleChartData(mSensorChartData);
+        mSensorChartView.setBubbleChartData(sensorChartData);
+    }
+
+    // Sets the viewport dimensions
+    private void setViewPort(int size){
+        Viewport viewport = new Viewport(mSensorChartView.getMaximumViewport());
+        viewport.bottom = -1 * size;
+        viewport.top = size;
+        viewport.left = -1 * size;
+        viewport.right = size;
+        mSensorChartView.setMaximumViewport(viewport);
+        mSensorChartView.setCurrentViewport(viewport);
+        mSensorChartView.setViewportCalculationEnabled(false);
     }
 
     @Override
     public void onResume(){
         super.onResume();
 
-        registerSensor(mAccelerometer);
-        for(Sensor sensor: mSensorList){
+        registerSensor(mSelectedSensor);
+        for(Sensor sensor: mSingleSensorList){
             registerSensor(sensor);
         }
     }
 
     @Override
     public void onPause(){
-        unregisterSensor(mAccelerometer);
-        for(Sensor sensor: mSensorList){
+        unregisterSensor(mSelectedSensor);
+        for(Sensor sensor: mSingleSensorList){
             unregisterSensor(sensor);
         }
 
