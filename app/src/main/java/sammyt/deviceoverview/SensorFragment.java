@@ -12,6 +12,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -43,16 +44,16 @@ public class SensorFragment extends Fragment implements SensorEventListener{
 
     private final String LOG_TAG = this.getClass().getSimpleName();
 
-    private SensorManager mSensorManager;
-    private Sensor mSelectedSensor;
-
     private ModBubbleChartView mSensorChartView;
     private TextView mSensorValuesText;
 
-    private SingleSensorAdapter mSingleAdapter;
-    private ArrayList<Sensor> mSingleSensorList;
+    private SensorManager mSensorManager;
 
     private ArrayList<Sensor> mMultipleSensorList;
+    private Sensor mSelectedSensor;
+
+    private SingleSensorAdapter mSingleAdapter;
+    private ArrayList<Sensor> mSingleSensorList;
 
     private float[] mSensorVals;
     private float mMaxZ = 10;
@@ -72,7 +73,7 @@ public class SensorFragment extends Fragment implements SensorEventListener{
         RecyclerView sensorGridView = root.findViewById(R.id.sensor_grid);
 
         // Set fixed viewport dimensions
-        setViewPort(15);
+        setViewPort(20);
 
         mSensorManager = (SensorManager) getContext().getSystemService(Context.SENSOR_SERVICE);
         List<Sensor> sensors = mSensorManager.getSensorList(Sensor.TYPE_ALL);
@@ -139,8 +140,8 @@ public class SensorFragment extends Fragment implements SensorEventListener{
                     setViewPort(100);
                     mMaxZ = 100;
                 }else{
-                    setViewPort(15);
-                    mMaxZ = 10;
+                    setViewPort(20);
+                    mMaxZ = 20;
                 }
             }
 
@@ -185,6 +186,7 @@ public class SensorFragment extends Fragment implements SensorEventListener{
             }
         }
 
+        // Create a grid layout with 2 columns
         GridLayoutManager layoutManager = new GridLayoutManager(getContext(), 2);
         sensorGridView.setLayoutManager(layoutManager);
 
@@ -293,6 +295,9 @@ public class SensorFragment extends Fragment implements SensorEventListener{
     @Override
     public void onResume(){
         super.onResume();
+
+        Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
+        toolbar.setTitle(getString(R.string.sensors));
 
         registerSensor(mSelectedSensor);
         for(Sensor sensor: mSingleSensorList){
