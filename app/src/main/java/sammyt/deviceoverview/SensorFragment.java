@@ -65,7 +65,7 @@ public class SensorFragment extends Fragment implements SensorEventListener{
     private ArrayList<Sensor> mSingleSensorList;
 
     private float[] mSensorVals;
-    private float mMaxZ = 20;
+    private float mMaxZ = 15;
 
     private ArrayList<float[]> mSensorHistory = new ArrayList<>();
 
@@ -86,7 +86,7 @@ public class SensorFragment extends Fragment implements SensorEventListener{
         RecyclerView sensorGridView = root.findViewById(R.id.sensor_grid);
 
         // Set fixed viewport dimensions
-        setViewPort(20);
+        setViewPort(15);
 
         Animation in = AnimationUtils.loadAnimation(getContext(), android.R.anim.slide_in_left);
         Animation out = AnimationUtils.loadAnimation(getContext(), android.R.anim.slide_out_right);
@@ -176,14 +176,13 @@ public class SensorFragment extends Fragment implements SensorEventListener{
                     setViewPort(100);
                     mMaxZ = 100;
                 }else{
-                    setViewPort(20);
-                    mMaxZ = 20;
+                    setViewPort(15);
+                    mMaxZ = 15;
                 }
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                Log.d(LOG_TAG, "nothing selected");
             }
         });
 
@@ -264,7 +263,7 @@ public class SensorFragment extends Fragment implements SensorEventListener{
                 mSingleAdapter.updateItem(event.sensor, event.values[0]);
                 break;
                 default:
-                    if(event.values.length == 3){ //// TODO: Switch this to >= for the 4 value sensor?
+                    if(event.values.length == 3){
                         if(mSensorVals != null && Arrays.equals(mSensorVals, event.values)){
                             break; // Break early if it's a duplicate value
                         }
@@ -314,8 +313,7 @@ public class SensorFragment extends Fragment implements SensorEventListener{
         // Set the axis attributes
         Axis axisX = new Axis();
         Axis axisY = new Axis().setHasLines(true);
-//        axisX.setName("Axis X");
-//        axisY.setName("Axis Y");
+
         sensorChartData.setAxisXBottom(axisX);
         sensorChartData.setAxisYLeft(axisY);
 
@@ -346,7 +344,7 @@ public class SensorFragment extends Fragment implements SensorEventListener{
             }
 
             Line line = new Line(values);
-            line.setColor(ChartUtils.COLORS[axis]); //// TODO: Make meaning from the colors?
+            line.setColor(ChartUtils.COLORS[axis]);
             line.setHasLines(true);
             line.setHasPoints(false);
             lines.add(line);

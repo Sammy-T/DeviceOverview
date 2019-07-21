@@ -4,7 +4,6 @@ package sammyt.deviceoverview;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
-import android.hardware.display.DisplayManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.storage.StorageManager;
@@ -12,10 +11,8 @@ import android.os.storage.StorageVolume;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.hardware.display.DisplayManagerCompat;
 import android.support.v7.widget.Toolbar;
-import android.text.method.ScrollingMovementMethod;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
@@ -116,7 +113,7 @@ public class MainFragment extends Fragment {
     public void onResume(){
         super.onResume();
 
-        NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
+        NavigationView navigationView = getActivity().findViewById(R.id.nav_view);
         navigationView.setCheckedItem(R.id.nav_home);
 
         Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
@@ -139,15 +136,15 @@ public class MainFragment extends Fragment {
             LinearLayout displayInfoView = (LinearLayout) LayoutInflater.from(getContext())
                     .inflate(R.layout.display_info_layout, displayInfoContainer, false);
 
-            LinearLayout realDimenLinLayout = (LinearLayout) displayInfoView.findViewById(R.id.real_dimension_ll);
-            LinearLayout stateLinLayout = (LinearLayout) displayInfoView.findViewById(R.id.state_ll);
+            LinearLayout realDimenLinLayout = displayInfoView.findViewById(R.id.real_dimension_ll);
+            LinearLayout stateLinLayout = displayInfoView.findViewById(R.id.state_ll);
 
-            TextView displayIdView = (TextView) displayInfoView.findViewById(R.id.display_id);
-            TextView displayDimenView = (TextView) displayInfoView.findViewById(R.id.display_dimensions);
-            TextView displayRealDimenView = (TextView) displayInfoView.findViewById(R.id.display_real_dimensions);
-            TextView displayDensView = (TextView) displayInfoView.findViewById(R.id.display_density);
-            TextView displayRefreshView = (TextView) displayInfoView.findViewById(R.id.display_refresh_rate);
-            TextView displayStateView = (TextView) displayInfoView.findViewById(R.id.display_state);
+            TextView displayIdView = displayInfoView.findViewById(R.id.display_id);
+            TextView displayDimenView = displayInfoView.findViewById(R.id.display_dimensions);
+            TextView displayRealDimenView = displayInfoView.findViewById(R.id.display_real_dimensions);
+            TextView displayDensView = displayInfoView.findViewById(R.id.display_density);
+            TextView displayRefreshView = displayInfoView.findViewById(R.id.display_refresh_rate);
+            TextView displayStateView = displayInfoView.findViewById(R.id.display_state);
 
             DisplayMetrics appDisplayMetrics = new DisplayMetrics();
             display.getMetrics(appDisplayMetrics);
@@ -276,8 +273,11 @@ public class MainFragment extends Fragment {
             case Build.VERSION_CODES.O_MR1:
                 releaseName = "Oreo MR1";
                 break;
+            case Build.VERSION_CODES.P:
+                releaseName = "Pie";
+                break;
             default:
-                releaseName = "Unknown Android version";
+                releaseName = "Unsupported Android version";
                 break;
         }
         return releaseName;
