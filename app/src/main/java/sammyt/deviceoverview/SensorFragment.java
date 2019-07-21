@@ -21,6 +21,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.ViewFlipper;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -30,10 +31,14 @@ import java.util.List;
 import lecho.lib.hellocharts.model.Axis;
 import lecho.lib.hellocharts.model.BubbleChartData;
 import lecho.lib.hellocharts.model.BubbleValue;
+import lecho.lib.hellocharts.model.Line;
+import lecho.lib.hellocharts.model.LineChartData;
+import lecho.lib.hellocharts.model.PointValue;
 import lecho.lib.hellocharts.model.ValueShape;
 import lecho.lib.hellocharts.model.Viewport;
 import lecho.lib.hellocharts.util.ChartUtils;
 import lecho.lib.hellocharts.view.BubbleChartView;
+import lecho.lib.hellocharts.view.LineChartView;
 import sammyt.deviceoverview.hellocharts.extension.ModBubbleChartView;
 
 
@@ -44,7 +49,10 @@ public class SensorFragment extends Fragment implements SensorEventListener{
 
     private final String LOG_TAG = this.getClass().getSimpleName();
 
+    private ViewFlipper mChartFlipper;
+
     private ModBubbleChartView mSensorChartView;
+    private LineChartView mHistoryChartView;
     private TextView mSensorValuesText;
 
     private SensorManager mSensorManager;
@@ -56,7 +64,9 @@ public class SensorFragment extends Fragment implements SensorEventListener{
     private ArrayList<Sensor> mSingleSensorList;
 
     private float[] mSensorVals;
-    private float mMaxZ = 10;
+    private float mMaxZ = 20;
+
+    private ArrayList<float[]> mSensorHistory = new ArrayList<>();
 
     public SensorFragment() {
         // Required empty public constructor
@@ -67,13 +77,31 @@ public class SensorFragment extends Fragment implements SensorEventListener{
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View root = inflater.inflate(R.layout.fragment_sensor, container, false);
+        mChartFlipper = root.findViewById(R.id.chart_flipper);
         mSensorChartView = root.findViewById(R.id.chart);
+        mHistoryChartView = root.findViewById(R.id.history_chart);
         mSensorValuesText = root.findViewById(R.id.sensor_values_text);
         Spinner sensorMultSpinner = root.findViewById(R.id.sensor_spinner);
         RecyclerView sensorGridView = root.findViewById(R.id.sensor_grid);
 
         // Set fixed viewport dimensions
         setViewPort(20);
+
+        mSensorChartView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                mChartFlipper.showNext();
+                return false;
+            }
+        });
+
+        mHistoryChartView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                mChartFlipper.showNext();
+                return false;
+            }
+        });
 
         mSensorManager = (SensorManager) getContext().getSystemService(Context.SENSOR_SERVICE);
         List<Sensor> sensors = mSensorManager.getSensorList(Sensor.TYPE_ALL);
@@ -129,6 +157,8 @@ public class SensorFragment extends Fragment implements SensorEventListener{
                 Log.d(LOG_TAG, "item selected " + mMultipleSensorList.get(position).getName());
 
                 unregisterSensor(mSelectedSensor); // Unregister previously selected sensor
+
+                mSensorHistory.clear(); // Clear values from the previous sensor from the history
 
                 int sensorType = mMultipleSensorList.get(position).getType();
                 mSelectedSensor = mSensorManager.getDefaultSensor(sensorType);
@@ -241,7 +271,13 @@ public class SensorFragment extends Fragment implements SensorEventListener{
                         }
                         mSensorValuesText.setText(sensorValues);
 
-                        refreshChart();
+                        addToHistory();
+
+                        if(mChartFlipper.getDisplayedChild() == 0){ // Refresh the displayed chart
+                            refreshChart();
+                        }else{
+                            refreshLineChart();
+                        }
                     }
                     break;
         }
@@ -280,6 +316,48 @@ public class SensorFragment extends Fragment implements SensorEventListener{
         mSensorChartView.setBubbleChartData(sensorChartData);
     }
 
+    // Adds to the history of values
+    private void addToHistory(){
+        mSensorHistory.add(mSensorVals);
+
+        int size = mSensorHistory.size();
+        int max = 10;
+        if(size > max){
+            int diff = size - max;
+            mSensorHistory.subList(0, diff).clear(); // Trim the list down to max size
+        }
+        Log.d(LOG_TAG, "size " + mSensorHistory.size());
+    }
+
+    // updates the line chart's data
+    private void refreshLineChart(){
+        // Add the history values to each line
+        ArrayList<Line> lines = new ArrayList<>();
+        for(int axis = 0; axis < 3; axis++){
+            ArrayList<PointValue> values = new ArrayList<>();
+
+            for(int pos = 0; pos < mSensorHistory.size(); pos++){
+                values.add(new PointValue(pos, mSensorHistory.get(pos)[axis]));
+            }
+
+            Line line = new Line(values);
+            line.setColor(ChartUtils.COLORS[axis]); //// TODO: Make meaning from the colors?
+            line.setHasLines(true);
+            line.setHasPoints(false);
+            lines.add(line);
+        }
+
+        LineChartData lineChartData = new LineChartData(lines); // Create the chart data
+
+        // Set the axis attributes
+        Axis axisX = new Axis();
+        Axis axisY = new Axis().setHasLines(true);
+        lineChartData.setAxisXBottom(axisX);
+        lineChartData.setAxisYLeft(axisY);
+
+        mHistoryChartView.setLineChartData(lineChartData);
+    }
+
     // Sets the viewport dimensions
     private void setViewPort(int size){
         Viewport viewport = new Viewport(mSensorChartView.getMaximumViewport());
@@ -290,6 +368,15 @@ public class SensorFragment extends Fragment implements SensorEventListener{
         mSensorChartView.setMaximumViewport(viewport);
         mSensorChartView.setCurrentViewport(viewport);
         mSensorChartView.setViewportCalculationEnabled(false);
+
+        Viewport vp = new Viewport((mHistoryChartView.getMaximumViewport()));
+        vp.bottom = -1 * size;
+        vp.top = size;
+        vp.left = 0;
+        vp.right = 10;
+        mHistoryChartView.setMaximumViewport(vp);
+        mHistoryChartView.setCurrentViewport(vp);
+        mHistoryChartView.setViewportCalculationEnabled(false);
     }
 
     @Override

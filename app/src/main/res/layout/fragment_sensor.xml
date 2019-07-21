@@ -12,10 +12,19 @@
         android:orientation="vertical"
         android:padding="6dp">
 
-        <sammyt.deviceoverview.hellocharts.extension.ModBubbleChartView
-            android:id="@+id/chart"
+        <ViewFlipper
+            android:id="@+id/chart_flipper"
             android:layout_width="match_parent"
-            android:layout_height="150dp" />
+            android:layout_height="wrap_content">
+            <sammyt.deviceoverview.hellocharts.extension.ModBubbleChartView
+                android:id="@+id/chart"
+                android:layout_width="match_parent"
+                android:layout_height="150dp" />
+            <lecho.lib.hellocharts.view.LineChartView
+                android:id="@+id/history_chart"
+                android:layout_width="match_parent"
+                android:layout_height="150dp" />
+        </ViewFlipper>
         <Spinner
             android:id="@+id/sensor_spinner"
             android:layout_width="match_parent"

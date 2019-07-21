@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.storage.StorageManager;
 import android.os.storage.StorageVolume;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -42,22 +43,22 @@ public class MainFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View root = inflater.inflate(R.layout.fragment_main, container, false);
 
-        TextView versionTextView = (TextView) root.findViewById(R.id.android_version_text);
-        TextView securityTextView = (TextView) root.findViewById(R.id.security_patch_text);
-        TextView brandTextView = (TextView) root.findViewById(R.id.brand_text);
-        TextView manuTextView = (TextView) root.findViewById(R.id.manufacturer_text);
-        TextView modelTextView = (TextView) root.findViewById(R.id.model_text);
-        TextView cpuTextView = (TextView) root.findViewById(R.id.cpu_abi_text);
-        TextView cpu2TextView = (TextView) root.findViewById(R.id.cpu_abi2_text);
+        TextView versionTextView = root.findViewById(R.id.android_version_text);
+        TextView securityTextView = root.findViewById(R.id.security_patch_text);
+        TextView brandTextView = root.findViewById(R.id.brand_text);
+        TextView manuTextView = root.findViewById(R.id.manufacturer_text);
+        TextView modelTextView = root.findViewById(R.id.model_text);
+        TextView cpuTextView = root.findViewById(R.id.cpu_abi_text);
+        TextView cpu2TextView = root.findViewById(R.id.cpu_abi2_text);
 
-        displayInfoContainer = (LinearLayout) root.findViewById(R.id.display_info_container);
+        displayInfoContainer = root.findViewById(R.id.display_info_container);
 
-        TextView sensorsTextView = (TextView) root.findViewById(R.id.sensors_text_view);
+        TextView sensorsTextView = root.findViewById(R.id.sensors_text_view);
 
         // Get Android version and build overview
         String versionText = "Android " + Build.VERSION.RELEASE + " " +
@@ -79,9 +80,9 @@ public class MainFragment extends Fragment {
         SensorManager sensorManager = (SensorManager) getContext().getSystemService(Context.SENSOR_SERVICE);
         List<Sensor> sensors = sensorManager.getSensorList(Sensor.TYPE_ALL);
 
-        String sensorText = "";
+        StringBuilder sensorText = new StringBuilder();
         for(Sensor sensor: sensors){
-            sensorText += sensor.getName() + "\n";
+            sensorText.append(sensor.getName()).append("\n");
         }
 
         sensorsTextView.setText(sensorText);
@@ -118,7 +119,7 @@ public class MainFragment extends Fragment {
         NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
         navigationView.setCheckedItem(R.id.nav_home);
 
-        Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
+        Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
         toolbar.setTitle(getString(R.string.app_name));
 
         // The number of displays may change, so get the info on resume
