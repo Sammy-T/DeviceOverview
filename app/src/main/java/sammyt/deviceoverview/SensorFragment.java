@@ -17,6 +17,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
@@ -37,7 +39,6 @@ import lecho.lib.hellocharts.model.PointValue;
 import lecho.lib.hellocharts.model.ValueShape;
 import lecho.lib.hellocharts.model.Viewport;
 import lecho.lib.hellocharts.util.ChartUtils;
-import lecho.lib.hellocharts.view.BubbleChartView;
 import lecho.lib.hellocharts.view.LineChartView;
 import sammyt.deviceoverview.hellocharts.extension.ModBubbleChartView;
 
@@ -86,6 +87,11 @@ public class SensorFragment extends Fragment implements SensorEventListener{
 
         // Set fixed viewport dimensions
         setViewPort(20);
+
+        Animation in = AnimationUtils.loadAnimation(getContext(), android.R.anim.slide_in_left);
+        Animation out = AnimationUtils.loadAnimation(getContext(), android.R.anim.slide_out_right);
+        mChartFlipper.setInAnimation(in);
+        mChartFlipper.setOutAnimation(out);
 
         mSensorChartView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -326,7 +332,6 @@ public class SensorFragment extends Fragment implements SensorEventListener{
             int diff = size - max;
             mSensorHistory.subList(0, diff).clear(); // Trim the list down to max size
         }
-        Log.d(LOG_TAG, "size " + mSensorHistory.size());
     }
 
     // updates the line chart's data
