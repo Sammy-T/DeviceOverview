@@ -8,6 +8,7 @@
     <string name="camera">Camera</string>
     <string name="battery">Battery</string>
     <string name="audio">Audio</string>
+    <string name="sensors">Sensors</string>
 
     <string name="action_settings">Settings</string>
 
