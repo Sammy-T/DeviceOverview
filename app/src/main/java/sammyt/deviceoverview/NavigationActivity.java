@@ -22,6 +22,7 @@ public class NavigationActivity extends AppCompatActivity
     private static final String BATTERY_FRAGMENT = "battery_fragment";
     private static final String AUDIO_VIDEO_FRAGMENT = "audio_video_fragment";
     private static final String SENSOR_FRAGMENT = "sensor_fragment";
+    private static final String VIBRATE_FRAGMENT = "vibrate_fragment";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -168,9 +169,25 @@ public class NavigationActivity extends AppCompatActivity
                         .addToBackStack(SENSOR_FRAGMENT)
                         .commit();
                 break;
+
+            case R.id.nav_vibration:
+                VibrationFragment vibrateFragment = (VibrationFragment) fragmentManager
+                        .findFragmentByTag(VIBRATE_FRAGMENT);
+
+                if(vibrateFragment != null && vibrateFragment.isVisible()){
+                    break; // Break early
+                }else if(vibrateFragment == null){
+                    vibrateFragment = new VibrationFragment();
+                }
+
+                fragmentManager.beginTransaction()
+                        .replace(R.id.content_container, vibrateFragment, VIBRATE_FRAGMENT)
+                        .addToBackStack(VIBRATE_FRAGMENT)
+                        .commit();
+                break;
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
