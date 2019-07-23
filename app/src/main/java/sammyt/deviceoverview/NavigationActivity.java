@@ -23,6 +23,7 @@ public class NavigationActivity extends AppCompatActivity
     private static final String AUDIO_VIDEO_FRAGMENT = "audio_video_fragment";
     private static final String SENSOR_FRAGMENT = "sensor_fragment";
     private static final String VIBRATE_FRAGMENT = "vibrate_fragment";
+    private static final String NOTIFY_FRAGMENT = "notify_fragment";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -183,6 +184,22 @@ public class NavigationActivity extends AppCompatActivity
                 fragmentManager.beginTransaction()
                         .replace(R.id.content_container, vibrateFragment, VIBRATE_FRAGMENT)
                         .addToBackStack(VIBRATE_FRAGMENT)
+                        .commit();
+                break;
+
+            case R.id.nav_notify:
+                NotificationFragment notifyFragment = (NotificationFragment) fragmentManager
+                        .findFragmentByTag(NOTIFY_FRAGMENT);
+
+                if(notifyFragment != null && notifyFragment.isVisible()){
+                    break; // Break early
+                }else if(notifyFragment == null){
+                    notifyFragment = new NotificationFragment();
+                }
+
+                fragmentManager.beginTransaction()
+                        .replace(R.id.content_container, notifyFragment, NOTIFY_FRAGMENT)
+                        .addToBackStack(NOTIFY_FRAGMENT)
                         .commit();
                 break;
         }

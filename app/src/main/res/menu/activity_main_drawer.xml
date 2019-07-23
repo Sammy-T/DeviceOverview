@@ -25,6 +25,9 @@
         <item
             android:id="@+id/nav_vibration"
             android:title="Vibration" />
+        <item
+            android:id="@+id/nav_notify"
+            android:title="Notification" />
     </group>
 
     <!--<item android:title="Communicate">
