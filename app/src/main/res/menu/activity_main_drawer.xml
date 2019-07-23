@@ -22,6 +22,9 @@
         <item
             android:id="@+id/nav_sensor"
             android:title="Sensors" />
+        <item
+            android:id="@+id/nav_vibration"
+            android:title="Vibration" />
     </group>
 
     <!--<item android:title="Communicate">
