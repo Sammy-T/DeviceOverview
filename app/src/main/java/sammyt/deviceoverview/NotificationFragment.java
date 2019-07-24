@@ -1,15 +1,19 @@
 package sammyt.deviceoverview;
 
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +25,7 @@ import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 
@@ -108,7 +113,23 @@ public class NotificationFragment extends Fragment {
             }
         });
 
+        clearButton.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                clearImages();
+                return false;
+            }
+        });
+
         return root;
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+
+        Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
+        toolbar.setTitle(R.string.notification);
     }
 
     private void requestPhotoUri(int requestCode){
@@ -131,16 +152,30 @@ public class NotificationFragment extends Fragment {
         }
     }
 
-    //// TODO: Resizing is causing issues for the icon image button
     // Sets the image in the Image Button resized to the view's dimensions
-    private void setImageButton(String imageUri, ImageButton imageButton){
+    private void setImageButton(final String imageUri, ImageButton imageButton){
+        int width = imageButton.getWidth();
+        int height = imageButton.getHeight();
+
+        Log.d(LOG_TAG, "width " + width + " height " + height);
+
         Picasso.get()
                 .load(imageUri)
-                .resize(imageButton.getWidth(), imageButton.getHeight())
+                .resize(width, height)
                 .onlyScaleDown()
                 .centerInside()
                 .error(android.R.drawable.stat_notify_error)
-                .into(imageButton);
+                .into(imageButton, new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        Log.d(LOG_TAG, "Picasso successfully loaded " + imageUri);
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        Log.e(LOG_TAG, "Picasso error " + imageUri, e);
+                    }
+                });
     }
 
     // Resets all fields to empty and images back to the default
@@ -151,25 +186,15 @@ public class NotificationFragment extends Fragment {
         mHourSelect.setSelection(0);
         mMinSelect.setSelection(0);
 
+        clearImages();
+    }
+
+    private void clearImages(){
         mIconUri = null;
         mImageUri = null;
 
-        //// TODO: I think resizing is causing issues for both here?
-        Picasso.get()
-                .load(R.drawable.plus_circle_outline)
-                .resize(mIconButton.getWidth(), mIconButton.getHeight())
-                .onlyScaleDown()
-                .centerInside()
-                .error(android.R.drawable.stat_notify_error)
-                .into(mIconButton);
-
-        Picasso.get()
-                .load(R.drawable.plus_circle_outline)
-                .resize(mImageButton.getWidth(), mImageButton.getHeight())
-                .onlyScaleDown()
-                .centerInside()
-                .error(android.R.drawable.stat_notify_error)
-                .into(mImageButton);
+        mIconButton.setImageResource(R.drawable.plus_circle_outline);
+        mImageButton.setImageResource(R.drawable.plus_circle_outline);
     }
 
     private void scheduleNotification(String title, String message, int delay){

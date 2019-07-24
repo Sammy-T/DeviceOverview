@@ -9,6 +9,8 @@
     <string name="battery">Battery</string>
     <string name="audio">Audio</string>
     <string name="sensors">Sensors</string>
+    <string name="vibration">Vibration</string>
+    <string name="notification">Schedule a notification</string>
 
     <string-array name="hour_entries">
         <item>0 hours</item>

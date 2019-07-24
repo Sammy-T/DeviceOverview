@@ -35,7 +35,7 @@
         android:baselineAligned="false">
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:orientation="vertical">
             <TextView
@@ -44,14 +44,20 @@
                 android:padding="6dp"
                 android:textAlignment="center"
                 android:text="Icon"/>
-            <ImageButton
-                android:id="@+id/notify_add_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:background="@android:color/transparent"
-                android:src="@drawable/plus_circle_outline"/>
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <!-- I had to resize this button to avoid a Picasso Read Ext Storage permission error -->
+                <ImageButton
+                    android:id="@+id/notify_add_icon"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_gravity="center"
+                    android:background="@android:color/transparent"
+                    android:src="@drawable/plus_circle_outline"/>
+            </FrameLayout>
         </LinearLayout>
+
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
