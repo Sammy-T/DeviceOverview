@@ -117,7 +117,7 @@ public class NotificationFragment extends Fragment {
             @Override
             public boolean onLongClick(View v) {
                 clearImages();
-                return false;
+                return true;
             }
         });
 
