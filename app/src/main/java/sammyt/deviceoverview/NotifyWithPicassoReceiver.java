@@ -86,10 +86,12 @@ public class NotifyWithPicassoReceiver extends BroadcastReceiver {
             try {
                 Uri uri = Uri.parse(iconUri);
 
+                // Use picasso to retrieve & scale the bitmap
                 Bitmap bitmap = Picasso.get()
                         .load(uri)
                         .resize(1000, 1000)
                         .onlyScaleDown()
+                        .centerInside()
                         .get();
 
                 notifyBuilder.setLargeIcon(bitmap);
@@ -104,11 +106,12 @@ public class NotifyWithPicassoReceiver extends BroadcastReceiver {
             try{
                 Uri uri = Uri.parse(imageUri);
 
-                //// TODO: Properly scale the big picture if it's too large?
+                // Use picasso to retrieve & scale the bitmap
                 Bitmap bigPicture = Picasso.get()
                         .load(uri)
                         .resize(1000, 1000)
                         .onlyScaleDown()
+                        .centerInside()
                         .get();
 
                 notifyBuilder.setStyle(new android.support.v4.app.NotificationCompat.BigPictureStyle()
