@@ -8,6 +8,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
@@ -54,6 +55,8 @@ public class NotificationFragment extends Fragment {
 
     private static final int REQUEST_ALARM = 719;
 
+    private static final int PERMISSION_REQUEST_READ_EXT_STORAGE = 844;
+
     public NotificationFragment() {
         // Required empty public constructor
     }
@@ -93,16 +96,16 @@ public class NotificationFragment extends Fragment {
         scheduleButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String title = mTitleView.getText().toString();
-                String message = mMessageView.getText().toString();
+                //// TODO: Move the permission request to my photo requests
+                if(!checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE) &&
+                        Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
 
-                // Use the selected spinner item to get the corresponding value
-                int hours = mHourVals[mHourSelect.getSelectedItemPosition()];
-                int minutes = mMinuteVals[mMinSelect.getSelectedItemPosition()];
+                    requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                            PERMISSION_REQUEST_READ_EXT_STORAGE);
 
-                int delay = getNotificationDelay(hours, minutes);
-
-                scheduleNotification(title, message, delay);
+                }else{
+                    scheduleNotification();
+                }
             }
         });
 
@@ -117,7 +120,7 @@ public class NotificationFragment extends Fragment {
             @Override
             public boolean onLongClick(View v) {
                 clearImages();
-                return true;
+                return true; // Consume the input so the regular click behavior doesn't trigger
             }
         });
 
@@ -149,6 +152,9 @@ public class NotificationFragment extends Fragment {
         }else if(requestCode == REQUEST_IMAGE && resultCode == Activity.RESULT_OK){
             mImageUri = data.getDataString();
             setImageButton(mImageUri, mImageButton);
+
+        }else if(requestCode == PERMISSION_REQUEST_READ_EXT_STORAGE && resultCode == Activity.RESULT_OK){
+            scheduleNotification();
         }
     }
 
@@ -197,28 +203,48 @@ public class NotificationFragment extends Fragment {
         mImageButton.setImageResource(R.drawable.plus_circle_outline);
     }
 
-    private void scheduleNotification(String title, String message, int delay){
+    // Schedules a notification with the user-set title, message, icon, & image
+    // to display at the specified delay
+    private void scheduleNotification(){
+        String title = mTitleView.getText().toString();
+        String message = mMessageView.getText().toString();
+
+        // Use the selected spinner item to get the corresponding value
+        int hours = mHourVals[mHourSelect.getSelectedItemPosition()];
+        int minutes = mMinuteVals[mMinSelect.getSelectedItemPosition()];
+
+        int delay = getNotificationDelay(hours, minutes);
+
         // Build the Notification intent
-        Intent notifyIntent = new Intent(getContext(), ScheduledNotifyReceiver.class);
-        notifyIntent.putExtra(ScheduledNotifyReceiver.NOTIFY_TITLE, title);
-        notifyIntent.putExtra(ScheduledNotifyReceiver.NOTIFY_MESSAGE, message);
+        Intent notifyIntent = new Intent(getContext(), NotifyWithPicassoReceiver.class);
+        notifyIntent.putExtra(NotifyWithPicassoReceiver.NOTIFY_TITLE, title);
+        notifyIntent.putExtra(NotifyWithPicassoReceiver.NOTIFY_MESSAGE, message);
 
         // Add the images if they're available
         if(mIconUri != null){
-            notifyIntent.putExtra(ScheduledNotifyReceiver.NOTIFY_ICON, mIconUri);
+            notifyIntent.putExtra(NotifyWithPicassoReceiver.NOTIFY_ICON, mIconUri);
         }
         if(mImageUri != null){
-            notifyIntent.putExtra(ScheduledNotifyReceiver.NOTIFY_IMAGE, mImageUri);
+            notifyIntent.putExtra(NotifyWithPicassoReceiver.NOTIFY_IMAGE, mImageUri);
         }
 
-        // Set up the alarm to trigger the notification
+        // Set up the Alarm pending intent to trigger the notification
         PendingIntent alarmIntent = PendingIntent.getBroadcast(getContext(), REQUEST_ALARM,
                 notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         long futureInMillis = SystemClock.elapsedRealtime() + delay;
 
         AlarmManager alarmManager = (AlarmManager) getContext().getSystemService(Context.ALARM_SERVICE);
-        alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, futureInMillis, alarmIntent);
+
+        // Request a more exact triggering of the alarm
+        // to counter power saving implementations on later API levels
+        // (This should be avoided if not necessary but we're looking
+        //  to trigger within a decent window from the scheduled delay)
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
+            alarmManager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, futureInMillis, alarmIntent);
+        }else{
+            alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, futureInMillis, alarmIntent);
+        }
 
         Toast.makeText(getContext(), "Notification Scheduled", Toast.LENGTH_SHORT).show();
     }
@@ -232,5 +258,14 @@ public class NotificationFragment extends Fragment {
         selectedDelay = hours + minutes;
 
         return selectedDelay;
+    }
+
+    private boolean checkPermission(String permission){
+        if(ContextCompat.checkSelfPermission(getContext(), permission) ==
+                PackageManager.PERMISSION_GRANTED){
+            return true; // Permission granted
+        }
+        Log.w(LOG_TAG, "Permission not granted: " + permission);
+        return false;
     }
 }

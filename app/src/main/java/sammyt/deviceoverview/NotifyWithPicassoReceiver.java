@@ -1,6 +1,5 @@
 package sammyt.deviceoverview;
 
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -16,9 +15,11 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
+import com.squareup.picasso.Picasso;
+
 import java.io.IOException;
 
-public class ScheduledNotifyReceiver extends BroadcastReceiver {
+public class NotifyWithPicassoReceiver extends BroadcastReceiver {
 
     private final String LOG_TAG = this.getClass().getSimpleName();
 
@@ -31,12 +32,19 @@ public class ScheduledNotifyReceiver extends BroadcastReceiver {
 
     private NotificationManager mNotifyManager;
 
+    private String notificationTitle;
+    private String notificationMessage;
+    private String notificationIconUri;
+    private String notificationImageUri;
+    private Context mContext;
+
     @Override
-    public void onReceive(Context context, Intent intent) {
-        String notificationTitle = intent.getStringExtra(NOTIFY_TITLE);
-        String notificationMessage = intent.getStringExtra(NOTIFY_MESSAGE);
-        String notificationIconUri = null;
-        String notificationImageUri = null;
+    public void onReceive(Context context, Intent intent){
+        mContext = context;
+        notificationTitle = intent.getStringExtra(NOTIFY_TITLE);
+        notificationMessage = intent.getStringExtra(NOTIFY_MESSAGE);
+        notificationIconUri = null;
+        notificationImageUri = null;
 
         if(intent.hasExtra(NOTIFY_ICON)){
             notificationIconUri = intent.getStringExtra(NOTIFY_ICON);
@@ -45,8 +53,15 @@ public class ScheduledNotifyReceiver extends BroadcastReceiver {
             notificationImageUri = intent.getStringExtra(NOTIFY_IMAGE);
         }
 
-        scheduledNotify(context, notificationTitle, notificationMessage, notificationIconUri,
-                notificationImageUri);
+        // Retrieving Bitmaps from Picasso can't be performed on the main thread
+        // Performing all the work on a new thread is a simple solution
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                scheduledNotify(mContext, notificationTitle, notificationMessage, notificationIconUri,
+                        notificationImageUri);
+            }
+        }).start();
     }
 
     private void scheduledNotify(Context context, String title, String message, String iconUri,
@@ -70,14 +85,12 @@ public class ScheduledNotifyReceiver extends BroadcastReceiver {
         if(iconUri != null){
             try {
                 Uri uri = Uri.parse(iconUri);
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), uri);
 
-                if(bitmap.getWidth() > 1000 || bitmap.getHeight() > 1000) {
-                    bitmap = ThumbnailUtils.extractThumbnail(bitmap, 1000, 1000);
-                }
-
-                //// TODO: I don't remember why I'm not using this. A memory or size issue maybe?
-//                bitmap = Bitmap.createScaledBitmap(bitmap, 1000, 1000, true);
+                Bitmap bitmap = Picasso.get()
+                        .load(uri)
+                        .resize(1000, 1000)
+                        .onlyScaleDown()
+                        .get();
 
                 notifyBuilder.setLargeIcon(bitmap);
 
@@ -90,12 +103,13 @@ public class ScheduledNotifyReceiver extends BroadcastReceiver {
         if(imageUri != null){
             try{
                 Uri uri = Uri.parse(imageUri);
-                Bitmap bigPicture = MediaStore.Images.Media.getBitmap(context.getContentResolver(), uri);
 
                 //// TODO: Properly scale the big picture if it's too large?
-                if(bigPicture.getWidth() > 1000 || bigPicture.getHeight() > 1000) {
-                    bigPicture = ThumbnailUtils.extractThumbnail(bigPicture, 1000, 1000);
-                }
+                Bitmap bigPicture = Picasso.get()
+                        .load(uri)
+                        .resize(1000, 1000)
+                        .onlyScaleDown()
+                        .get();
 
                 notifyBuilder.setStyle(new android.support.v4.app.NotificationCompat.BigPictureStyle()
                         .bigPicture(bigPicture)

@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -27,9 +28,9 @@
         <receiver
             android:name=".BatteryFragment$BatteryReceiver"
             android:exported="false" />
-
         <receiver
-            android:name=".ScheduledNotifyReceiver"
+            android:name=".NotifyWithPicassoReceiver"
+            android:enabled="true"
             android:exported="false" />
 
     </application>
