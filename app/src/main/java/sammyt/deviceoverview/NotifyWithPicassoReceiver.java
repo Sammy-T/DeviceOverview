@@ -75,7 +75,7 @@ public class NotifyWithPicassoReceiver extends BroadcastReceiver {
 
         // Build the notification
         NotificationCompat.Builder notifyBuilder = new NotificationCompat.Builder(context, CHANNEL_ID);
-        notifyBuilder.setSmallIcon(R.drawable.ic_menu_send)
+        notifyBuilder.setSmallIcon(R.drawable.bell)
                 .setContentTitle(title)
                 .setContentText(message)
                 .setAutoCancel(true)

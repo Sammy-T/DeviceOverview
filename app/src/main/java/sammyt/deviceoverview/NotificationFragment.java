@@ -170,7 +170,7 @@ public class NotificationFragment extends Fragment {
                 .resize(width, height)
                 .onlyScaleDown()
                 .centerInside()
-                .error(android.R.drawable.stat_notify_error)
+                .error(R.drawable.ic_alert_circle_grey600_24dp)
                 .into(imageButton, new Callback() {
                     @Override
                     public void onSuccess() {
