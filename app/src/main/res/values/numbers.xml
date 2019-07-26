@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer-array name="hour_values">
+        <item>0</item>
+        <item>1</item>
+        <item>3</item>
+        <item>6</item>
+        <item>12</item>
+    </integer-array>
+
+    <integer-array name="minute_values">
+        <item>0</item>
+        <item>1</item>
+        <item>15</item>
+        <item>30</item>
+        <item>45</item>
+    </integer-array>
+</resources>

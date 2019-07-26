@@ -24,7 +24,6 @@
         android:padding="10dp"
         android:gravity="center"
         android:background="@color/colorPrimaryDark"
-        android:textColor="@android:color/white"
-        android:text="Reserved" />
+        android:textColor="@android:color/white" />
 
 </LinearLayout>

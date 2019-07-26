@@ -4,13 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="8dp"
     tools:context="sammyt.deviceoverview.MainFragment">
 
-    <!-- TODO: Hardcoded text to resource strings -->
+    <!-- TODO: Change hardcoded text to resource strings -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:padding="8dp"
         android:orientation="vertical">
         <TextView
             android:id="@+id/android_version_text"

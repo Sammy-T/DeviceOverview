@@ -3,6 +3,8 @@
     package="sammyt.deviceoverview">
 
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -11,6 +13,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <activity
             android:name=".NavigationActivity"
             android:label="@string/app_name"
@@ -25,6 +28,11 @@
         <receiver
             android:name=".BatteryFragment$BatteryReceiver"
             android:exported="false" />
+        <receiver
+            android:name=".NotifyWithPicassoReceiver"
+            android:enabled="true"
+            android:exported="false" />
+
     </application>
 
 </manifest>
